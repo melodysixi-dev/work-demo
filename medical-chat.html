@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>医疗 AI · 对话工作台</title>
+  <style>
+    :root{color-scheme:light;--ink:#213c3a;--muted:#6a807c;--line:#dfe9e5;--green:#176d56;--pale:#edf5f0;--bg:#f7f9f6}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
+    button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:9px;background:white;color:var(--ink);padding:8px 12px}button:hover{background:var(--pale)}button:disabled{opacity:.45;cursor:not-allowed}
+    input,select,textarea{width:100%;border:1px solid #d5e1da;background:#fff;border-radius:8px;padding:9px 10px;color:var(--ink);outline:none}input:focus,select:focus,textarea:focus{border-color:#629c85;box-shadow:0 0 0 3px #176d5610}textarea{resize:vertical}
+    input[type=checkbox]{width:17px;height:17px;accent-color:var(--green)}label{display:block;font-size:12px;font-weight:600;margin-bottom:5px}small,.muted{color:var(--muted);font-size:12px}a{color:var(--green)}[hidden]{display:none!important}
+    .app{display:grid;grid-template-columns:300px minmax(0,1fr);height:100dvh;min-height:500px}.sidebar{padding:26px 22px;overflow:auto;background:#fff;border-right:1px solid var(--line)}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}.mark{width:39px;height:39px;border-radius:12px;display:grid;place-items:center;color:white;background:var(--green);font-size:25px;font-weight:300}.brand strong{font-size:17px;letter-spacing:.5px}.brand small{display:block;font-size:10px;letter-spacing:1.5px}
+    .section-title{font-size:10px;letter-spacing:1.8px;color:#7a8d82;margin:24px 0 12px}.field{margin:14px 0}.key-row{display:flex;gap:6px}.key-row button{flex:none;padding:7px 9px;font-size:12px}.switch{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:14px 0}.switch label{margin:0;font-size:13px}.hint{font-size:11px;color:var(--muted);line-height:1.6;margin-top:7px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}.plain{border:0;background:none;padding:0;color:var(--muted);font-size:11px;text-decoration:underline}
+    details.settings{border-top:1px solid var(--line);padding-top:13px;margin-top:18px}summary{cursor:pointer;font-size:12px;color:var(--muted)}.endpoint{font:10px/1.7 ui-monospace,SFMono-Regular,monospace;word-break:break-all;padding:10px;background:var(--bg);border:1px solid var(--line);border-radius:8px}
+    .main{display:flex;flex-direction:column;min-width:0;min-height:0}.topbar{height:76px;flex:none;border-bottom:1px solid var(--line);padding:0 35px;display:flex;align-items:center;justify-content:space-between;gap:12px}.eyebrow{font-size:10px;letter-spacing:1.7px;color:var(--muted)}.topbar strong{display:block;font-size:15px}.toolbar{display:flex;gap:8px}.toolbar button{font-size:12px}.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}.dot{width:6px;height:6px;border-radius:50%;background:#72a88a}
+    .chat-scroll{flex:1;overflow:auto;min-height:0;scroll-behavior:smooth}.chat-inner{max-width:850px;margin:auto;padding:28px 35px 36px}.welcome{padding:7vh 0 20px}.badge{display:inline-block;color:var(--green);font-size:11px;background:#e7f0e7;border:1px solid #d8e5d7;border-radius:30px;padding:4px 10px}.welcome h1{font-size:34px;line-height:1.4;font-weight:500;letter-spacing:-1px;margin:20px 0 12px}.welcome p{color:var(--muted);max-width:550px}.examples{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:30px}.example{text-align:left;padding:16px 18px;background:#fff;border-radius:12px}.example b{display:block;font-size:13px;margin-bottom:6px}.example span{font-size:12px;color:var(--muted)}
+    .notice{padding:10px 13px;border-radius:9px;font-size:12px;line-height:1.7;margin:0 0 18px;border:1px solid #e6dfc9;background:#fcf8ed;color:#877244}.notice.error{color:#a33e32;background:#fff3f0;border-color:#edcec8}.notice a{color:inherit}.message{padding:22px 0;border-bottom:1px solid var(--line)}.message.user{margin-left:40px}.message-head{display:flex;gap:9px;align-items:center;margin-bottom:10px;font-size:12px;font-weight:600}.avatar{width:24px;height:24px;display:grid;place-items:center;background:#e4eee6;color:var(--green);border-radius:7px;font-size:11px}.user .avatar{background:#e7ebed;color:#52646c}.message-body{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.9}.message-body:empty::before{content:'正在等待回复…';color:var(--muted)}.reasoning{margin-bottom:15px;background:#edf2ed;border:1px solid var(--line);padding:10px 14px;border-radius:9px}.reasoning pre{font:12px/1.85 inherit;white-space:pre-wrap;overflow-wrap:anywhere;color:#647770;margin:10px 0 2px}.message-meta{font-size:10px;color:var(--muted);margin-top:12px;overflow-wrap:anywhere}.message-error{font-size:12px;color:#a33e32;white-space:pre-wrap;margin-top:12px}.copy{font-size:10px;padding:1px 6px;margin-left:auto;border:0;background:none;color:var(--muted)}.message-image{max-width:180px;max-height:180px;border:1px solid var(--line);border-radius:8px;margin-top:10px}.sources{margin-top:14px;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:8px}.sources a{display:block;font-size:12px;margin:5px 0;overflow-wrap:anywhere}
+    .composer-wrap{padding:15px 35px 16px;flex:none;background:linear-gradient(0deg,var(--bg) 92%,transparent)}.composer-area{max-width:780px;margin:auto}.composer{border:1px solid #ccdcd1;border-radius:14px;background:#fff;box-shadow:0 6px 25px #244c3610;padding:12px}.composer textarea{padding:0 3px;resize:none;min-height:64px;max-height:220px;border:0;box-shadow:none;font-size:14px}.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px}.composer-left{display:flex;align-items:center;gap:10px;min-width:0}.composer small{font-size:10px}.primary{background:var(--green);color:white;border-color:var(--green);padding:8px 20px}.primary:hover{background:#135642}.stop{background:#fff2ee;color:#9c4b3b;border-color:#ead1c8}.footnote{text-align:center;font-size:10px;color:#84928a;margin-top:10px}.attachment{font-size:12px;background:var(--pale);padding:6px 10px;margin-bottom:10px;border-radius:7px;display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}.attachment button{margin-left:auto;padding:0 6px}.image-input{margin-bottom:12px;padding:12px;background:var(--pale);border-radius:9px}.status{font-size:11px;color:var(--muted);margin:9px 3px 0;overflow-wrap:anywhere}.mobile-toggle{display:none}.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#263f35;color:white;padding:9px 18px;border-radius:10px;z-index:10;font-size:12px;max-width:90vw}
+    @media(max-width:850px){.app{grid-template-columns:260px minmax(0,1fr)}.sidebar{padding:22px 16px}.topbar{padding:0 20px}.chat-inner{padding:22px}.composer-wrap{padding:12px 20px}.welcome h1{font-size:28px}.examples{grid-template-columns:1fr}.live{display:none}}
+    @media(max-width:620px){.app{display:flex;min-height:0}.main{width:100%}.sidebar{position:fixed;inset:61px 0 0 0;z-index:5;display:none;border:0;padding:20px 24px}.sidebar.open{display:block}.mobile-toggle{display:block}.topbar{height:61px;padding:0 15px}.topbar>div:first-child{min-width:0;flex:1}.toolbar{gap:5px;flex:none}.toolbar button{padding:6px 8px;white-space:nowrap}.chat-inner{padding:20px}.composer-wrap{padding:10px 14px}.welcome{padding-top:5vh}.welcome h1{font-size:28px}.composer small{display:none}.message.user{margin-left:16px}.eyebrow{font-size:9px}.topbar strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar" aria-label="连接与模型设置">
+    <div class="brand"><div class="mark">✳</div><div><strong>医疗 AI</strong><small>CONVERSATION STUDIO</small></div></div>
+    <div class="section-title">CONNECTION / 接入</div>
+    <div class="field"><label for="service">服务类型</label><select id="service"><option value="qa">医疗助手</option><option value="model">医疗基模</option></select></div>
+    <div class="field"><label for="model">模型</label><select id="model"></select></div>
+    <div class="field"><label for="apiKey">API Key</label><div class="key-row"><input id="apiKey" type="password" placeholder="输入当前服务的 API Key" autocomplete="off" spellcheck="false"><button id="toggleKey" type="button" aria-label="显示 API Key">显示</button></div><div class="hint" id="keyHint">仅保存在当前浏览器 localStorage，两个服务分别保存。</div><button id="forgetKey" class="plain" type="button">清除当前服务的 Key</button></div>
+    <div class="section-title">GENERATION / 生成</div>
+    <div class="switch"><label for="stream">流式输出 <small>SSE</small></label><input id="stream" type="checkbox" checked></div>
+    <div id="modelSettings">
+      <div class="switch"><label for="thinking">思考模式</label><input id="thinking" type="checkbox" checked></div>
+      <div class="hint">思考内容独立展示。参数是否生效取决于所选模型。</div>
+      <div class="two"><div class="field"><label for="temperature">Temperature</label><input id="temperature" type="number" min="0" max="2" step="0.1" placeholder="模型默认"></div><div class="field"><label for="topP">Top P</label><input id="topP" type="number" min="0.01" max="1" step="0.05" placeholder="模型默认"></div></div>
+      <div class="field"><label for="maxTokens">最大输出 Token</label><input id="maxTokens" type="number" min="1" step="1" placeholder="模型默认 · max_completion_tokens"></div>
+      <details class="settings"><summary>更多参数</summary>
+        <div class="two"><div class="field"><label for="frequencyPenalty">频率惩罚</label><input id="frequencyPenalty" type="number" min="-2" max="2" step="0.1" placeholder="默认 0"></div><div class="field"><label for="presencePenalty">存在惩罚</label><input id="presencePenalty" type="number" min="-2" max="2" step="0.1" placeholder="默认 0"></div></div>
+        <div class="field"><label for="stopWords">停止词（每行一个）</label><textarea id="stopWords" rows="2" placeholder="留空使用默认值"></textarea></div>
+        <div class="field"><label for="systemPrompt">系统提示词</label><textarea id="systemPrompt" rows="4" placeholder="可留空">You are a helpful assistant.</textarea></div>
+      </details>
+    </div>
+    <p id="qaHint" class="hint">医疗助手按附录 B 发送消息、模型与流式参数。</p>
+    <div class="section-title">ENDPOINT / 接口</div>
+    <div class="endpoint" id="endpoint"></div>
+    <p class="hint">切换服务或模型将开始新对话。对话与图片仅保留在当前页面，刷新后清空。</p>
+    <a href="https://alidocs.dingtalk.com/i/nodes/oP0MALyR8kzGnoOwFMLbD7YmJ3bzYmDO" target="_blank" rel="noopener noreferrer" class="hint">查看接口文档 ↗</a>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><div class="eyebrow">MEDICAL AI / PLAYGROUND</div><strong id="chatTitle">医疗助手</strong></div><div class="toolbar"><span class="live"><span class="dot"></span>本地代理 → zx-dsc.sm.cn</span><button id="settingsToggle" type="button" class="mobile-toggle">设置</button><button id="exportChat" type="button">导出对话</button><button id="newChat" type="button">＋ 新对话</button></div></header>
+    <div class="chat-scroll" id="chatScroll"><div class="chat-inner">
+      <div id="localNotice" class="notice" hidden>请先在项目目录运行 npm start，再访问 http://127.0.0.1:3000。页面通过本地 Node.js 代理调用接口。</div>
+      <section class="welcome" id="welcome"><span class="badge">夸克医疗 · 对话工作台</span><h1>从一个问题开始，<br>探索医疗 AI 的能力。</h1><p>已配置服务端密钥，选择服务即可开始对话。支持连续追问、实时生成，以及医疗基模的思考与图片理解。</p><div class="examples"><button type="button" class="example" data-prompt="病毒性感冒通常有哪些症状？日常应如何护理？"><b>日常健康问答 ↗</b><span>了解常见症状与日常护理</span></button><button type="button" class="example" data-prompt="请解释体检报告中血红蛋白这一指标的含义，以及解读时需要关注哪些信息。"><b>理解医学指标 ↗</b><span>把专业术语变得容易理解</span></button></div></section>
+      <div id="messages" role="log" aria-label="对话消息" aria-live="off"></div>
+    </div></div>
+    <div class="composer-wrap"><div class="composer-area">
+      <div id="errorBanner" role="alert" class="notice error" hidden></div>
+      <div class="image-input" id="imagePanel" hidden><label for="imageUrl">图片链接（HTTPS）</label><input id="imageUrl" type="url" placeholder="https://…"><div class="hint">或选择本地图片，将作为 data URL 发送。图片仅在 medical-vl 模型下可用。</div><input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" style="margin-top:8px"><div class="field"><label for="imageDetail">图片精度</label><select id="imageDetail"><option value="auto">auto · 自动</option><option value="high">high · 高</option><option value="low">low · 低</option></select></div></div>
+      <div class="composer"><div id="attachment" class="attachment" hidden><span id="attachmentName"></span><button id="removeImage" type="button" aria-label="移除图片">×</button></div><textarea id="prompt" rows="2" aria-label="输入消息" placeholder="输入你的问题，或继续追问…"></textarea><div class="composer-bottom"><div class="composer-left"><button id="imageToggle" type="button" hidden>＋ 图片</button><small>Enter 发送 · Shift + Enter 换行</small></div><div><button id="retry" type="button" hidden>重试</button> <button id="stop" type="button" class="stop" hidden>停止生成</button><button id="send" type="button" class="primary">发送 ↑</button></div></div></div>
+      <div class="status" id="status" role="status">准备就绪</div><div class="footnote">AI 生成内容仅供参考，不能替代医生诊断。</div>
+    </div></div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+'use strict';
+(() => {
+  /* SERVER_CONFIG */
+  const $ = id => document.getElementById(id);
+  const API_ORIGIN = 'https://zx-dsc.sm.cn';
+  const SERVICES = {
+    qa: {title:'医疗助手',path:'/model/api/med-general-qa/chat/completions',models:['quark_medical_chat']},
+    model: {title:'医疗基模',path:'/model/api/chat/completions',models:['medical-model','medical-vl','med-ai-bench-eval']}
+  };
+  const KEY_PREFIX = 'medical-chat.apikey.';
+  let activeService = 'qa', activeModel = 'quark_medical_chat';
+  let turns = [], sessionId = uuid(), controller = null, fileImage = null, loadingImage = false, toastTimer;
+  function uuid() {
+    if (globalThis.crypto?.randomUUID) return crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+      const n = Math.floor(Math.random()*16); return (c === 'x' ? n : (n&3)|8).toString(16);
+    });
+  }
+  function toast(message) {
+    $('toast').textContent = message; $('toast').hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').hidden = true, 3500);
+  }
+  function showError(message = '') { $('errorBanner').textContent = message; $('errorBanner').hidden = !message; }
+  function loadKey() {
+    $('apiKey').placeholder = SERVER_KEYS[activeService] ? '已配置服务端密钥，可留空直接演示' : '输入当前服务的 API Key';
+    $('keyHint').textContent = SERVER_KEYS[activeService] ? '服务端密钥已就绪；填写新 Key 可临时覆盖。' : '仅保存在当前浏览器 localStorage，两个服务分别保存。';
+    try { $('apiKey').value = localStorage.getItem(KEY_PREFIX + activeService) || ''; }
+    catch { $('keyHint').textContent = '浏览器禁用了本地存储，Key 仅在当前页面有效。'; }
+    $('apiKey').type = 'password'; $('toggleKey').textContent = '显示'; $('toggleKey').setAttribute('aria-label','显示 API Key');
+  }
+  function saveKey() {
+    try {
+      const key = $('apiKey').value.trim();
+      if (key) localStorage.setItem(KEY_PREFIX + activeService,key);
+      else localStorage.removeItem(KEY_PREFIX + activeService);
+    } catch { $('keyHint').textContent = '无法写入本地存储，Key 仅在当前页面有效。'; }
+  }
+  function clearImage() {
+    fileImage = null; $('imageFile').value = ''; $('imageUrl').value = '';
+    $('attachment').hidden = true;
+  }
+  function syncAttachment() {
+    const name = fileImage?.name || $('imageUrl').value.trim();
+    $('attachmentName').textContent = name ? '图片 · ' + name : '';
+    $('attachment').hidden = !name;
+  }
+  function resetConversation() {
+    turns = []; sessionId = uuid(); $('messages').replaceChildren(); $('welcome').hidden = false;
+    $('retry').hidden = true; $('status').textContent = '准备就绪'; showError(); clearImage();
+    $('prompt').value = ''; $('imagePanel').hidden = true;
+  }
+  function configureService() {
+    activeService = $('service').value;
+    const service = SERVICES[activeService];
+    $('model').replaceChildren(...service.models.map(name => new Option(name,name)));
+    activeModel = $('model').value;
+    $('modelSettings').hidden = activeService !== 'model'; $('qaHint').hidden = activeService !== 'qa';
+    $('endpoint').textContent = 'POST ' + service.path + '\n本地代理 → ' + API_ORIGIN;
+    $('chatTitle').textContent = service.title; loadKey(); configureModel();
+  }
+  function configureModel() {
+    activeModel = $('model').value;
+    $('imageToggle').hidden = activeModel !== 'medical-vl'; $('imagePanel').hidden = true;
+    $('chatTitle').textContent = SERVICES[activeService].title + ' · ' + activeModel;
+    clearImage();
+  }
+  function setBusy(busy) {
+    for (const id of ['service','model','apiKey','forgetKey','newChat','stream','thinking','temperature','topP','maxTokens','frequencyPenalty','presencePenalty','stopWords','systemPrompt','send','retry','imageFile','imageUrl','imageDetail','imageToggle','removeImage']) $(id).disabled = busy;
+    $('send').hidden = busy; $('stop').hidden = !busy;
+    if (!busy) $('stop').disabled = false;
+  }
+  function scrollIfNearBottom() {
+    const scroller = $('chatScroll');
+    const near = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 160;
+    return () => { if (near) scroller.scrollTop = scroller.scrollHeight; };
+  }
+  function contentText(content) {
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) return content.map(part => typeof part === 'string' ? part : part.text || '').join('');
+    return '';
+  }
+  function makeMessage(role, text, image) {
+    const article = document.createElement('article'); article.className = 'message ' + role;
+    const header = document.createElement('div'); header.className = 'message-head';
+    const avatar = document.createElement('span'); avatar.className = 'avatar'; avatar.textContent = role === 'user' ? '你' : '✳';
+    const name = document.createElement('span'); name.textContent = role === 'user' ? '你' : activeModel;
+    header.append(avatar,name); article.append(header);
+    let reasoning, reasoningText, sources, meta, error;
+    if (role === 'assistant') {
+      const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'copy'; copy.textContent = '复制';
+      copy.onclick = async () => {
+        try { await navigator.clipboard.writeText(body.textContent); toast('已复制回复'); }
+        catch { toast('浏览器不允许访问剪贴板，请选择回复后复制。'); }
+      };
+      header.append(copy);
+      reasoning = document.createElement('details'); reasoning.className = 'reasoning'; reasoning.open = true; reasoning.hidden = true;
+      const summary = document.createElement('summary'); summary.textContent = '思考过程';
+      reasoningText = document.createElement('pre'); reasoning.append(summary,reasoningText); article.append(reasoning);
+    }
+    const body = document.createElement('div'); body.className = 'message-body'; body.textContent = text || ''; article.append(body);
+    if (image) {
+      const img = document.createElement('img'); img.className = 'message-image'; img.src = image; img.alt = '本轮输入图片'; img.referrerPolicy = 'no-referrer'; article.append(img);
+    }
+    if (role === 'assistant') {
+      sources = document.createElement('details'); sources.className = 'sources'; sources.hidden = true;
+      const summary = document.createElement('summary'); summary.textContent = '参考来源'; sources.append(summary); article.append(sources);
+      error = document.createElement('div'); error.className = 'message-error'; article.append(error);
+      meta = document.createElement('div'); meta.className = 'message-meta'; article.append(meta);
+    }
+    $('messages').append(article); $('welcome').hidden = true;
+    return {article,body,reasoning,reasoningText,sources,meta,error};
+  }
+  function safeUrl(value) {
+    try { const url = new URL(value); return ['https:','http:'].includes(url.protocol) ? url.href : null; } catch { return null; }
+  }
+  function renderSources(view, docs) {
+    if (!Array.isArray(docs)) return;
+    while (view.sources.children.length > 1) view.sources.lastChild.remove();
+    const seen = new Set();
+    for (const doc of docs) {
+      const url = safeUrl(doc.normalized_url || doc.url);
+      if (!url || seen.has(url)) continue;
+      seen.add(url);
+      const link = document.createElement('a'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.textContent = (doc.index ? '[' + doc.index + '] ' : '') + (doc.title || new URL(url).hostname); view.sources.append(link);
+    }
+    view.sources.hidden = !seen.size;
+  }
+  function redact(value, key) { return key ? String(value).split(key).join('[API Key 已隐藏]') : String(value); }
+  function apiError(data) {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return '接口返回了不支持的响应结构。';
+    if (data.error) return typeof data.error === 'string' ? data.error : data.error.message || JSON.stringify(data.error);
+    if (data.error_code != null && String(data.error_code) !== '0') return data.error_msg || '接口错误 ' + data.error_code;
+    return null;
+  }
+  function numeric(body,id,field,min,max,integer = false) {
+    const input = $(id), raw = input.value.trim();
+    if (input.validity.badInput) throw new Error(input.previousElementSibling.textContent + ' 必须是有效数字。');
+    if (!raw) return;
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < min || n > max || (integer && !Number.isInteger(n))) throw new Error(field + ' 超出有效范围。');
+    body[field] = n;
+  }
+  function buildRequest(userContent, history) {
+    const messages = [];
+    if (activeService === 'model' && $('systemPrompt').value.trim()) messages.push({role:'system',content:$('systemPrompt').value.trim()});
+    for (const turn of history) if (turn.status === 'complete') messages.push({role:'user',content:turn.user},{role:'assistant',content:turn.answer});
+    messages.push({role:'user',content:userContent});
+    const body = {model:activeModel,messages,stream:$('stream').checked,session_id:sessionId,request_id:uuid()};
+    if (activeService === 'model') {
+      body.enable_thinking = $('thinking').checked;
+      body.chat_template_kwargs = {enable_thinking:body.enable_thinking};
+      numeric(body,'temperature','temperature',0,2); numeric(body,'topP','top_p',0.000001,1);
+      numeric(body,'maxTokens','max_completion_tokens',1,Number.MAX_SAFE_INTEGER,true);
+      numeric(body,'frequencyPenalty','frequency_penalty',-2,2); numeric(body,'presencePenalty','presence_penalty',-2,2);
+      const stop = $('stopWords').value.split('\n').map(s => s.trim()).filter(Boolean);
+      if (stop.length) body.stop = stop;
+    }
+    return body;
+  }
+  async function consumeSSE(response,onData) {
+    if (!response.body) throw new Error('浏览器不支持读取流式响应。');
+    const reader = response.body.getReader(), decoder = new TextDecoder();
+    let buffer = '', dataLines = [], ended = false;
+    function dispatch() {
+      if (!dataLines.length) return;
+      const data = dataLines.join('\n').trim(); dataLines = [];
+      if (data === '[DONE]') { ended = true; return; }
+      if (!data) return;
+      let parsed;
+      try { parsed = JSON.parse(data); } catch { throw new Error('收到无法解析的 SSE 数据，回复可能不完整。'); }
+      onData(parsed);
+    }
+    function line(value) {
+      if (value === '') dispatch();
+      else if (value.startsWith('data:')) dataLines.push(value.slice(5).replace(/^ /,''));
+    }
+    function drain(final) {
+      let start = 0;
+      for (let i = 0; i < buffer.length; i++) {
+        const c = buffer[i];
+        if (c !== '\n' && c !== '\r') continue;
+        if (c === '\r' && i === buffer.length-1 && !final) break;
+        line(buffer.slice(start,i));
+        if (c === '\r' && buffer[i+1] === '\n') i++;
+        start = i+1;
+        if (ended) break;
+      }
+      buffer = buffer.slice(start);
+      if (final && !ended) { if (buffer) line(buffer); buffer = ''; dispatch(); }
+    }
+    try {
+      while (!ended) {
+        const {value,done} = await reader.read();
+        buffer += done ? decoder.decode() : decoder.decode(value,{stream:true}); drain(done);
+        if (done) break;
+      }
+      return ended;
+    } finally { await reader.cancel().catch(() => {}); reader.releaseLock(); }
+  }
+  async function send(isRetry = false) {
+    if (controller) return;
+    showError();
+    if (!['http:','https:'].includes(location.protocol)) { showError('请运行 npm start，并通过 http://127.0.0.1:3000 打开页面。'); return; }
+    const key = $('apiKey').value.trim();
+    if (!key && !SERVER_KEYS[activeService]) { showError('请先在设置中输入当前服务的 API Key。'); $('apiKey').focus(); if (innerWidth <= 620) $('sidebar').classList.add('open'); return; }
+    if (loadingImage) { showError('图片仍在读取，请稍后发送。'); return; }
+    const failedTurn = isRetry ? turns.at(-1) : null;
+    if (isRetry && (!failedTurn || failedTurn.status === 'complete')) return;
+    if (!isRetry && turns.length && turns.at(-1).status !== 'complete') { showError('上一轮未完成。请先重试，或开始新对话。'); return; }
+    const text = $('prompt').value.trim();
+    let image = fileImage?.url || $('imageUrl').value.trim(), userContent;
+    if (isRetry) userContent = failedTurn.user;
+    else {
+      if (image && activeModel !== 'medical-vl') { showError('图片输入需要选择 medical-vl。'); return; }
+      if (image && !fileImage && !/^https:\/\//i.test(image)) { showError('请输入有效的 HTTPS 图片链接。'); return; }
+      if (!text && !image) { $('prompt').focus(); return; }
+      userContent = image ? [{type:'text',text:text || '请描述这张图片。'},{type:'image_url',image_url:{url:image,detail:$('imageDetail').value}}] : text;
+    }
+    let body;
+    try { body = buildRequest(userContent,isRetry ? turns.slice(0,-1) : turns); }
+    catch (error) { showError(error.message); return; }
+    saveKey();
+    let turn;
+    if (isRetry) { turn = failedTurn; turn.view.article.remove(); }
+    else {
+      makeMessage('user',contentText(userContent),image);
+      turn = {user:userContent}; turns.push(turn); $('prompt').value = ''; clearImage(); $('imagePanel').hidden = true;
+    }
+    Object.assign(turn,{answer:'',reasoning:'',status:'pending',requestId:body.request_id,usage:null,finishReason:null,firstToken:null});
+    turn.view = makeMessage('assistant');
+    $('sidebar').classList.remove('open');
+    const view = turn.view, start = performance.now();
+    controller = new AbortController(); const signal = controller.signal; setBusy(true);
+    $('status').textContent = '正在连接 · request_id: ' + body.request_id;
+    $('chatScroll').scrollTop = $('chatScroll').scrollHeight;
+    let terminal = false;
+    function onData(data) {
+      const error = apiError(data); if (error) throw new Error(error);
+      const scroll = scrollIfNearBottom();
+      if (data.usage) turn.usage = data.usage;
+      const choice = data.choices?.find(c => c.index === 0) || data.choices?.[0];
+      if (choice) {
+        const delta = choice.delta || choice.message || {};
+        const reasoning = contentText(delta.reasoning_content || delta.reasoning), content = contentText(delta.content);
+        if ((reasoning || content) && turn.firstToken === null) turn.firstToken = (performance.now()-start)/1000;
+        turn.reasoning += reasoning; turn.answer += content;
+        view.body.textContent = turn.answer;
+        if (turn.reasoning) { view.reasoning.hidden = false; view.reasoningText.textContent = turn.reasoning; }
+        const finish = choice.finish_reason;
+        if (finish && finish !== 'null') { turn.finishReason = finish; terminal = true; }
+        renderSources(view,delta.meta_data?.ra_doc_list);
+      }
+      $('status').textContent = (turn.reasoning && !turn.answer ? '正在思考' : '正在生成') + ' · request_id: ' + body.request_id;
+      scroll();
+    }
+    try {
+      const response = await fetch(SERVICES[activeService].path,{
+        method:'POST',headers:{'Content-Type':'application/json','Accept':body.stream ? 'text/event-stream' : 'application/json',...(key ? {'Authorization':'Bearer ' + key} : {})},
+        body:JSON.stringify(body),signal,credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer'
+      });
+      if (!response.ok) {
+        const raw = await response.text(); let detail = raw;
+        try { const data = JSON.parse(raw); detail = apiError(data) || data.message || data.msg || raw; } catch {}
+        throw new Error('HTTP ' + response.status + (detail ? ' · ' + detail.slice(0,900) : '') + ([401,403].includes(response.status) ? '\n请检查当前服务的 API Key 与模型权限。' : ''));
+      }
+      if ((response.headers.get('content-type') || '').includes('text/event-stream')) {
+        const done = await consumeSSE(response,onData);
+        if (!done && !terminal) throw new Error('流连接提前结束，未收到完成标记。请重试。');
+      } else {
+        let data;
+        try { data = await response.json(); } catch { throw new Error('接口未返回有效的 JSON 或 SSE。'); }
+        onData(data);
+      }
+      if (!turn.answer.trim()) throw new Error('接口未返回最终回答' + (turn.reasoning ? '，仅收到思考内容。可增加最大输出 Token 后重试。' : '。请重试。'));
+      turn.status = 'complete';
+      if (turn.finishReason === 'length') view.error.textContent = '达到最大输出 Token，回复可能被截断。';
+      if (turn.finishReason === 'content_filter') view.error.textContent = '回复受到内容过滤限制。';
+      $('status').textContent = '已完成 · 可继续追问';
+    } catch (error) {
+      turn.status = signal.aborted ? 'stopped' : 'error';
+      let message = signal.aborted ? '已停止生成。本轮不加入后续上下文，可点击重试。' : (error instanceof TypeError ? '无法连接本地代理或响应中断。请确认 npm start 仍在运行，并检查本机网络。' : error.message);
+      message = redact(message,key); view.error.textContent = message; showError(message);
+      if (!turn.answer) view.body.textContent = signal.aborted ? '生成已停止' : '未获得回答';
+      $('status').textContent = signal.aborted ? '已停止 · 可以重试' : '请求失败 · 可以重试';
+    } finally {
+      const elapsed = ((performance.now()-start)/1000).toFixed(2);
+      const parts = ['耗时 ' + elapsed + 's'];
+      if (turn.firstToken !== null) parts.push('首字 ' + turn.firstToken.toFixed(2) + 's');
+      if (turn.usage) parts.push('Token: ' + (turn.usage.prompt_tokens ?? '—') + ' 输入 / ' + (turn.usage.completion_tokens ?? '—') + ' 输出');
+      parts.push('request_id: ' + body.request_id); view.meta.textContent = parts.join(' · ');
+      controller = null; setBusy(false); $('retry').hidden = turn.status === 'complete';
+      $('prompt').focus();
+    }
+  }
+  $('service').onchange = () => { resetConversation(); configureService(); };
+  $('model').onchange = () => { resetConversation(); configureModel(); };
+  $('apiKey').oninput = saveKey;
+  $('toggleKey').onclick = () => {
+    const reveal = $('apiKey').type === 'password'; $('apiKey').type = reveal ? 'text' : 'password';
+    $('toggleKey').textContent = reveal ? '隐藏' : '显示'; $('toggleKey').setAttribute('aria-label',reveal ? '隐藏 API Key' : '显示 API Key');
+  };
+  $('forgetKey').onclick = () => { $('apiKey').value = ''; saveKey(); toast('已清除当前服务的 API Key'); };
+  $('settingsToggle').onclick = () => $('sidebar').classList.toggle('open');
+  $('send').onclick = () => send(); $('retry').onclick = () => send(true);
+  $('stop').onclick = () => { if (controller) { controller.abort(); $('stop').disabled = true; } };
+  $('newChat').onclick = () => { resetConversation(); $('prompt').focus(); };
+  $('prompt').onkeydown = event => { if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) { event.preventDefault(); send(); } };
+  document.querySelectorAll('[data-prompt]').forEach(button => button.onclick = () => { $('prompt').value = button.dataset.prompt; $('prompt').focus(); });
+  $('imageToggle').onclick = () => $('imagePanel').hidden = !$('imagePanel').hidden;
+  $('removeImage').onclick = clearImage;
+  $('imageUrl').oninput = () => { fileImage = null; $('imageFile').value = ''; syncAttachment(); };
+  $('imageFile').onchange = async () => {
+    const file = $('imageFile').files[0]; if (!file) return;
+    if (!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)) { showError('请选择 PNG、JPEG、WebP 或 GIF 图片。'); $('imageFile').value = ''; return; }
+    if (file.size > 10*1024*1024) { showError('本页面支持 10 MB 以内的图片，请压缩后上传。'); $('imageFile').value = ''; return; }
+    loadingImage = true;
+    for (const id of ['send','retry','service','model','newChat','imageFile','imageUrl','removeImage']) $(id).disabled = true;
+    try {
+      const url = await new Promise((resolve,reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = () => reject(new Error('图片读取失败')); reader.readAsDataURL(file); });
+      fileImage = {name:file.name,url}; $('imageUrl').value = ''; syncAttachment(); showError();
+    } catch (error) { showError(error.message); }
+    finally { loadingImage = false; for (const id of ['send','retry','service','model','newChat','imageFile','imageUrl','removeImage']) $(id).disabled = false; }
+  };
+  $('exportChat').onclick = () => {
+    if (!turns.length) { toast('还没有可导出的对话'); return; }
+    const data = {service:activeService,model:activeModel,session_id:sessionId,turns:turns.map(turn => ({user:Array.isArray(turn.user) ? turn.user.map(part => part.type === 'image_url' ? {type:'image_url',image_url:{url:'[图片已省略]',detail:part.image_url.detail}} : part) : turn.user,answer:turn.answer,reasoning:turn.reasoning,status:turn.status,request_id:turn.requestId,usage:turn.usage}))};
+    const url = URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+    const link = document.createElement('a'); link.href = url; link.download = 'medical-chat-' + new Date().toISOString().slice(0,10) + '.json'; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
+  };
+  configureService();
+  $('localNotice').hidden = ['http:','https:'].includes(location.protocol);
+})();
+</script>
+</body>
+</html>
