@@ -1,0 +1,13 @@
+{
+  "name": "medical-chat-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "医疗助手与医疗基模本地对话工作台",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test server.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
